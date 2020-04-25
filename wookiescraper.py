@@ -258,8 +258,11 @@ def create_complete_database(max_num_pages=None, name='Complete Database.csv', a
 
     print('Creating CSV File...')
     df = pd.DataFrame(data, columns=['Title', 'Text', 'Categories'])
+
     # removes Star Wars alphabetic letters from the database
     df = df[df.Text != 'The letter ']
+    df.reset_index(drop=True, inplace=True)
+    
     df.to_csv(name)
 
     print('Done!')
