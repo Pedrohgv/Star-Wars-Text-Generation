@@ -117,9 +117,6 @@ class CallbackPlot(Callback):
                         self.line_list.append(
                             window.plot(self.losses_and_metrics_dict[variable], label=legend)[0])
 
-                    """ window.set(xlabel='Epoch', ylabel=plot_settings['ylabel'])
-                    window.set_title(plot_settings['title'])
- """
                 else:
                     last_epochs = plot_settings['last_epochs']
                     # plots all the variables for this plot
@@ -128,11 +125,8 @@ class CallbackPlot(Callback):
                             window.plot(range(
                                 epoch - last_epochs + 1, epoch + 1), self.losses_and_metrics_dict[variable][-last_epochs:], label=legend)[0])
 
-                    """ window.set(xlabel='Last ' + str(last_epochs) + ' Epochs',
-                               ylabel=plot_settings['ylabel'])
-                    window.set_title(
-                        plot_settings['title'] + ' on last ' + str(last_epochs) + ' epochs')
- """
+                    window.set_xlim(left=epoch - last_epochs + 1, right=epoch)
+
                 window.legend()
                 self.custom_pause(0.1)
 
@@ -208,6 +202,8 @@ class ExperimentalPlotCallback(Callback):
         for line in self.line_list:
             line.remove()
 
+        self.custom_pause(0.1)
+
         self.line_list = []
 
         # calls the right figure to modify it
@@ -220,7 +216,7 @@ class ExperimentalPlotCallback(Callback):
                 window = window[0]
                 # clears plot
                 # window.clear()
-                plt.pause(0.05)
+                self.custom_pause(0.1)
 
                 # checks if the whole data is to be ploted
                 if ('last_epochs' not in plot_settings) or (epoch < plot_settings['last_epochs']):
@@ -236,6 +232,9 @@ class ExperimentalPlotCallback(Callback):
                     for variable, legend in plot_settings['variables'].items():
                         self.line_list.append(window.plot(range(
                             epoch - last_epochs + 1, epoch + 1), self.losses_and_metrics_dict[variable][-last_epochs:], label=legend)[0])
+
+                    self.custom_pause(0.1)
+                    window.set_xlim(left=epoch-last_epochs+1, right=epoch)
 
                 window.legend()
                 self.custom_pause(0.1)

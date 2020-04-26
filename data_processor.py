@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 
 MAX_LEN_TITLE = 128
-MAX_LEN_TEXT = 2048
+MAX_LEN_TEXT = 390
 
 
 def replace_string(df, index, column='Text', replace="", by=""):
@@ -87,6 +87,8 @@ def clean_data(df):
 
     # adds the 'end of sentence' char to the Title column
     df.Title = df.Title + '\n'
+
+    df.Text = df.Text.str.split('.').map(lambda x: x[0] + '.\n')
 
     return df
 
@@ -200,7 +202,7 @@ def build_datasets(df, seed=None, validation_samples=3000, batch=1, vocab=None):
     validation_dataset = tf.data.Dataset.from_generator(dataset_generator, output_types=({'encoder_input': tf.float64, 'decoder_input': tf.float64}, {'output': tf.float64}),
                                                         output_shapes=({'encoder_input': tf.TensorShape((None, None)), 'decoder_input': tf.TensorShape((None, None))}, {'output': tf.TensorShape((None, None))}), args=(
         val_int_encoder_input, val_int_decoder_input, val_int_output, len(vocab)))
-    
+
     validation_dataset = validation_dataset.batch(batch)
     validation_dataset = validation_dataset.repeat()
 
@@ -221,8 +223,8 @@ def one_hot2char(array, vocab):
     strings = []
     for vector in ints:
         string = ''.join([int2char[index] for index in vector])
-        strings.append(string.split('\n')[0])
-        # strings.append(string)
+        # strings.append(string.split('\n')[0])
+        strings.append(string)
     return strings
 
 
