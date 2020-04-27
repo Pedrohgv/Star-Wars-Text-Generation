@@ -97,7 +97,8 @@ class CallbackPlot(Callback):
         if epoch > 1:
             for line in self.line_list:
                 line.remove()
-            self.line_list = []
+        
+        self.line_list = []
 
         if epoch > 0:
 
@@ -105,8 +106,6 @@ class CallbackPlot(Callback):
 
                 window = window[0]
 
-                # clears plot
-                # window.clear()
                 plt.pause(0.05)
 
                 # checks if the whole data is to be ploted
@@ -118,14 +117,19 @@ class CallbackPlot(Callback):
                             window.plot(self.losses_and_metrics_dict[variable], label=legend)[0])
 
                 else:
+                    max_y = 0
                     last_epochs = plot_settings['last_epochs']
                     # plots all the variables for this plot
                     for variable, legend in plot_settings['variables'].items():
-                        self.line_list.append(
-                            window.plot(range(
-                                epoch - last_epochs + 1, epoch + 1), self.losses_and_metrics_dict[variable][-last_epochs:], label=legend)[0])
+                        line = window.plot(range(
+                                epoch - last_epochs + 1, epoch + 1), self.losses_and_metrics_dict[variable][-last_epochs:], label=legend)[0]
+                        self.line_list.append(line)
 
+                        if max(line.get_ydata()) > max_y: # gets 
+                            max_y = max(line.get_ydata())
+                        
                     window.set_xlim(left=epoch - last_epochs + 1, right=epoch)
+                    window.set_ylim(bottom=0, top=1.2*max_y)
 
                 window.legend()
                 self.custom_pause(0.1)
@@ -137,114 +141,6 @@ class CallbackPlot(Callback):
         plt.savefig(self.folder_path + '/' + self.title + '.png')
         self.custom_pause(0.1)
 
-
-class ExperimentalPlotCallback(Callback):
-
-    def __init__(self, plots_settings, title,
-                 folder_path='Training Plots/Training',
-                 share_x=False):
-        # =============================================================================
-        #         Initializes figure
-        #         plots_settings: tuple containing dictionaries. Each dictionary corresponds to settings of a plot (window)
-        #               'variables': another dictionary, containing variables to be monitored, eg {'loss': 'Training loss', 'val_loss': 'Validation loss'}
-        #               'title': title of window
-        #               'ylabel': label of y axes
-        #               'last_epochs': last epochs to plot. if not present in dictionary, the whole log will be ploted
-        #         title: title of figure
-        #         folder_path: path of folder that will contain all the training information
-        #         share_x: either to share the X axis or not
-        # =============================================================================
-
-        super().__init__()
-        self.plots_settings = plots_settings
-        self.plot_count = len(plots_settings)
-        self.title = title
-        self.share_x = share_x
-        self.folder_path = folder_path
-
-    def on_train_begin(self, logs={}):
-        plt.ion()
-
-        self.figure, self.windows = plt.subplots(self.plot_count, 1, figsize=[15, 4*self.plot_count], clear=True, num=self.title,
-                                                 sharex=self.share_x, constrained_layout=True, squeeze=False)
-
-        # sets axis labels and titles for windows
-        for window, plot_settings in zip(self.windows, self.plots_settings):
-
-            window = window[0]
-
-            if ('last_epochs' not in plot_settings):
-                window.set(xlabel='Epoch', ylabel=plot_settings['ylabel'])
-                window.set_title(plot_settings['title'])
-
-            else:
-                last_epochs = plot_settings['last_epochs']
-                window.set(xlabel='Last ' + str(last_epochs) +
-                           ' Epochs', ylabel=plot_settings['ylabel'])
-                window.set_title(
-                    plot_settings['title'] + ' on last ' + str(last_epochs) + ' epochs')
-
-        self.custom_pause(0.1)
-        # dictionary that contains losses and metrics throughout training
-        self.losses_and_metrics_dict = {}
-
-        for plot_settings in self.plots_settings:
-            for variable in plot_settings['variables'].keys():
-                self.losses_and_metrics_dict[variable] = []
-
-    def on_epoch_end(self, epoch, logs={}):
-
-        variables_list = self.losses_and_metrics_dict.keys()
-
-        for variable in variables_list:
-            self.losses_and_metrics_dict[variable].append(logs.get(variable))
-
-        for line in self.line_list:
-            line.remove()
-
-        self.custom_pause(0.1)
-
-        self.line_list = []
-
-        # calls the right figure to modify it
-        plt.figure(self.title)
-
-        if epoch > 1:
-
-            for window, plot_settings in zip(self.windows, self.plots_settings):
-
-                window = window[0]
-                # clears plot
-                # window.clear()
-                self.custom_pause(0.1)
-
-                # checks if the whole data is to be ploted
-                if ('last_epochs' not in plot_settings) or (epoch < plot_settings['last_epochs']):
-
-                    # plots all the variables for this plot
-                    for variable, legend in plot_settings['variables'].items():
-                        self.line_list.append(window.plot(
-                            self.losses_and_metrics_dict[variable], label=legend)[0])
-
-                else:
-                    last_epochs = plot_settings['last_epochs']
-                    # plots all the variables for this plot
-                    for variable, legend in plot_settings['variables'].items():
-                        self.line_list.append(window.plot(range(
-                            epoch - last_epochs + 1, epoch + 1), self.losses_and_metrics_dict[variable][-last_epochs:], label=legend)[0])
-
-                    self.custom_pause(0.1)
-                    window.set_xlim(left=epoch-last_epochs+1, right=epoch)
-
-                window.legend()
-                self.custom_pause(0.1)
-
-    def on_train_end(self, logs={}):
-
-        # saves losses abd metrics plot
-        plt.figure(self.title, clear=False)
-        plt.savefig(self.folder_path + '/' + self.title + '.png')
-        self.custom_pause(0.1)
 
 
 class CallbackSaveLogs(Callback):
