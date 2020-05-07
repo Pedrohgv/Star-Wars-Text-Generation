@@ -97,7 +97,7 @@ class CallbackPlot(Callback):
         if epoch > 1:
             for line in self.line_list:
                 line.remove()
-        
+
         self.line_list = []
 
         if epoch > 0:
@@ -106,7 +106,7 @@ class CallbackPlot(Callback):
 
                 window = window[0]
 
-                plt.pause(0.05)
+                self.custom_pause(0.05)
 
                 # checks if the whole data is to be ploted
                 if ('last_epochs' not in plot_settings) or (epoch < plot_settings['last_epochs']):
@@ -122,12 +122,12 @@ class CallbackPlot(Callback):
                     # plots all the variables for this plot
                     for variable, legend in plot_settings['variables'].items():
                         line = window.plot(range(
-                                epoch - last_epochs + 1, epoch + 1), self.losses_and_metrics_dict[variable][-last_epochs:], label=legend)[0]
+                            epoch - last_epochs + 1, epoch + 1), self.losses_and_metrics_dict[variable][-last_epochs:], label=legend)[0]
                         self.line_list.append(line)
 
-                        if max(line.get_ydata()) > max_y: # gets 
+                        if max(line.get_ydata()) > max_y:  # gets
                             max_y = max(line.get_ydata())
-                        
+
                     window.set_xlim(left=epoch - last_epochs + 1, right=epoch)
                     window.set_ylim(bottom=0, top=1.2*max_y)
 

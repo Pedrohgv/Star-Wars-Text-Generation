@@ -31,17 +31,19 @@ class Article:
             return self.message
 
     # articles are to be rejected if they belong to any of these categories
-    reject = ['Real-world articles',
-              'Star Wars media by canonicity',
-              'Legends articles',
-              'Pages with missing permanent archival links',
-              'Disambiguation pages',
-              'Years']
+    self.reject = ['Real-world articles',
+                   'Star Wars media by canonicity',
+                   'Pages with missing permanent archival links',
+                   'Disambiguation pages',
+                   'Years']
 
     subscripts = ['[1]', '[2]', '[3]', '[4]', '[5]', '[6]', '[7]', '[8]', '[9]', '[10]',
                   '[11]', '[12]', '[13]', '[14]', '[15]', '[16]', '[17]', '[18]', '[19]', '[20]']
 
-    def __init__(self, URL=None, verbosity=True, attempts=3):
+    def __init__(self, URL=None, canon_only=True, verbosity=True, attempts=3):
+
+        if canon_only:
+            self.reject.append('Legends articles')
 
         if verbosity:
             print('Acquiring article...')
@@ -198,7 +200,7 @@ def create_random_database(size=1000, name='Articles.csv', attempts=3):
     return None
 
 
-def create_complete_database(max_num_pages=None, name='Complete Database.csv', attempts=3):
+def create_complete_database(max_num_pages=None, name='Complete Database.csv', canon_only=True, attempts=3):
     """Scraps all canon and valid articles from wookiepedia and saves them on a file
     """
 
@@ -245,7 +247,8 @@ def create_complete_database(max_num_pages=None, name='Complete Database.csv', a
     data = []
     for link in pb(links):
         try:
-            article = Article(URL=link, verbosity=False, attempts=attempts)
+            article = Article(URL=link, canon_only=canon_only,
+                              verbosity=False, attempts=attempts)
 
             # checks if article belongs to any of the 'forbidden' categories
             if article.is_suited():
@@ -262,7 +265,7 @@ def create_complete_database(max_num_pages=None, name='Complete Database.csv', a
     # removes Star Wars alphabetic letters from the database
     df = df[df.Text != 'The letter ']
     df.reset_index(drop=True, inplace=True)
-    
+
     df.to_csv(name)
 
     print('Done!')

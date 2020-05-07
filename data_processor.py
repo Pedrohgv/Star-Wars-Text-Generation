@@ -3,7 +3,7 @@ import numpy as np
 
 import tensorflow as tf
 
-MAX_LEN_TITLE = 128
+MAX_LEN_TITLE = 82
 MAX_LEN_TEXT = 390
 
 
@@ -59,6 +59,12 @@ def clean_data(df):
                         replace='=', by='equals')  # Vote Yes on Prop 31-814D
     df = replace_string(df, index=4480, column='Text',
                         replace=' (pronounced /sɪndə/)')  # Cynda
+    df = replace_string(df, index=4979, column='Text',
+                        replace='%', by=' percent')
+    df = replace_string(df, index=6626, column='Text', replace=';',
+                        by=',')  # Form VII
+    df = replace_string(df, index=13676, column='Text', replace=';',
+                        by=',')
 
     # replaces specified characters from Text and Title columns
     df = replace_whole(df, replace='â', by='a')
@@ -78,7 +84,12 @@ def clean_data(df):
     df = replace_whole(df, replace='—', by='-')
     df = replace_whole(df, replace='  ', by=' ')
     df = replace_whole(df, replace='[source?]')
-
+    df = replace_whole(df, replace=';', by='.')
+    
+    drop_list = [20378, 1264, 5220, 7109, 8377, 9250, 17081, 20276]
+    for index in drop_list:
+        df.drop(index, inplace=True)
+    
     for i in range(20, 100, 1):
         df = replace_whole(df, replace='[' + str(i) + ']')
 
@@ -89,6 +100,11 @@ def clean_data(df):
     df.Title = df.Title + '\n'
 
     df.Text = df.Text.str.split('.').map(lambda x: x[0] + '.\n')
+
+    df.reset_index(drop=True, inplace=True)
+
+    df['Title'] = df.Title.str.lower()  # lower all characters
+    df['Text'] = df.Text.str.lower()
 
     return df
 
@@ -170,8 +186,7 @@ def build_datasets(df, seed=None, validation_samples=3000, batch=1, vocab=None):
     validation_samples: int that determines how much of the data is going to the validation 
     batch: defines the how many elements each batch in the training dataset will have 
     '''
-    df = clean_data(df)
-
+    
     # randomly reorder dataframe.
     df = df.sample(frac=1, random_state=seed).reset_index(drop=True)
 
