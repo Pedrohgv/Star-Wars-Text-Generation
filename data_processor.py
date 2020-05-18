@@ -3,8 +3,8 @@ import numpy as np
 
 import tensorflow as tf
 
-MAX_LEN_TITLE = 82
-MAX_LEN_TEXT = 390
+MAX_LEN_TITLE = 67
+MAX_LEN_TEXT = 120
 
 
 def replace_string(df, index, column='Text', replace="", by=""):
@@ -85,11 +85,11 @@ def clean_data(df):
     df = replace_whole(df, replace='  ', by=' ')
     df = replace_whole(df, replace='[source?]')
     df = replace_whole(df, replace=';', by='.')
-    
+
     drop_list = [20378, 1264, 5220, 7109, 8377, 9250, 17081, 20276]
     for index in drop_list:
         df.drop(index, inplace=True)
-    
+
     for i in range(20, 100, 1):
         df = replace_whole(df, replace='[' + str(i) + ']')
 
@@ -99,12 +99,16 @@ def clean_data(df):
     # adds the 'end of sentence' char to the Title column
     df.Title = df.Title + '\n'
 
-    df.Text = df.Text.str.split('.').map(lambda x: x[0] + '.\n')
+    df.Text = df.Text.str.split(r'\. ').map(
+        lambda x: x[0] + '.\n' if x[0][-1] != '\n' else x)  # adds end of line character, if text doesn't have one
 
     df.reset_index(drop=True, inplace=True)
 
     df['Title'] = df.Title.str.lower()  # lower all characters
     df['Text'] = df.Text.str.lower()
+
+    # gets only articles which texts have between 30 and 119 chars
+    df = df[(df.Text.str.len() >= 30) & (df.Text.str.len() <= 119)]
 
     return df
 
@@ -186,7 +190,7 @@ def build_datasets(df, seed=None, validation_samples=3000, batch=1, vocab=None):
     validation_samples: int that determines how much of the data is going to the validation 
     batch: defines the how many elements each batch in the training dataset will have 
     '''
-    
+
     # randomly reorder dataframe.
     df = df.sample(frac=1, random_state=seed).reset_index(drop=True)
 
@@ -204,7 +208,7 @@ def build_datasets(df, seed=None, validation_samples=3000, batch=1, vocab=None):
                                                       output_shapes=({'encoder_input': tf.TensorShape((None, None)), 'decoder_input': tf.TensorShape((None, None))}, {'output': tf.TensorShape((None, None))}), args=(
         train_int_encoder_input, train_int_decoder_input, train_int_output, len(vocab), seed))
 
-    training_dataset = training_dataset.batch(batch)
+    training_dataset = training_dataset.batch(batch, drop_remainder=True)
     training_dataset = training_dataset.repeat()
 
     ######### VALIDATION DATASET ##########################
@@ -218,7 +222,7 @@ def build_datasets(df, seed=None, validation_samples=3000, batch=1, vocab=None):
                                                         output_shapes=({'encoder_input': tf.TensorShape((None, None)), 'decoder_input': tf.TensorShape((None, None))}, {'output': tf.TensorShape((None, None))}), args=(
         val_int_encoder_input, val_int_decoder_input, val_int_output, len(vocab)))
 
-    validation_dataset = validation_dataset.batch(batch)
+    validation_dataset = validation_dataset.batch(batch, drop_remainder=True)
     validation_dataset = validation_dataset.repeat()
 
     return training_dataset, validation_dataset
