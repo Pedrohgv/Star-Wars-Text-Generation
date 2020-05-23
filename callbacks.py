@@ -129,8 +129,8 @@ class CallbackPlot(Callback):
                         if max(line.get_ydata()) > max_y:  # gets max y
                             max_y = max(line.get_ydata())
 
-                    if min(line.get_ydata) < min_y:
-                        min_y = min(line.get_ydata())
+                        if min(line.get_ydata()) < min_y:   # gets minimum y
+                            min_y = min(line.get_ydata())
 
                     window.set_xlim(left=epoch - last_epochs + 1, right=epoch)
                     window.set_ylim(bottom=0.8*min_y, top=1.2*max_y)
