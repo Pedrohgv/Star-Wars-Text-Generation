@@ -118,6 +118,7 @@ class CallbackPlot(Callback):
 
                 else:
                     max_y = 0
+                    min_y = 999999
                     last_epochs = plot_settings['last_epochs']
                     # plots all the variables for this plot
                     for variable, legend in plot_settings['variables'].items():
@@ -125,11 +126,14 @@ class CallbackPlot(Callback):
                             epoch - last_epochs + 1, epoch + 1), self.losses_and_metrics_dict[variable][-last_epochs:], label=legend)[0]
                         self.line_list.append(line)
 
-                        if max(line.get_ydata()) > max_y:  # gets
+                        if max(line.get_ydata()) > max_y:  # gets max y
                             max_y = max(line.get_ydata())
 
+                    if min(line.get_ydata) < min_y:
+                        min_y = min(line.get_ydata())
+
                     window.set_xlim(left=epoch - last_epochs + 1, right=epoch)
-                    window.set_ylim(bottom=0, top=1.2*max_y)
+                    window.set_ylim(bottom=0.8*min_y, top=1.2*max_y)
 
                 window.legend()
                 self.custom_pause(0.1)
@@ -140,7 +144,6 @@ class CallbackPlot(Callback):
         plt.figure(self.title, clear=False)
         plt.savefig(self.folder_path + '/' + self.title + '.png')
         self.custom_pause(0.1)
-
 
 
 class CallbackSaveLogs(Callback):
