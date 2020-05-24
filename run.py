@@ -42,17 +42,19 @@ vocab = list(vocab) + ['[START]']
 
 config = {  # dictionary that contains the training set up. Will be saved as a JSON file
     'DIM_VOCAB': len(vocab),
+    'MAX_LEN_TITLE': MAX_LEN_TITLE,
+    'MAX_LEN_TEXT': MAX_LEN_TEXT,
     'DIM_LSTM_LAYER': 512,
     'ENCODER_DEPTH': 2,
     'DECODER_DEPTH': 2,
-    'LEARNING_RATE': 0.001,
-    'BATCH_SIZE': 32,
+    'LEARNING_RATE': 0.0005,
+    'BATCH_SIZE': 16,
     'EPOCHS': 100,
     'SEED': 1,
     # 'GRAD_VAL_CLIP': 0.5,
     # 'GRAD_NORM_CLIP': 1,
     'DECAY_AT_10_EPOCHS': 0.9,
-    'DROPOUT': 0.3,
+    'DROPOUT': 0.2,
 }
 tf.random.set_seed(config['SEED'])
 data = pd.read_csv('Complete Database.csv', index_col=0)
@@ -187,4 +189,4 @@ root, _ = os.path.split(folder_path)
 timestamp_end = timestamp_end.replace(':', '-')
 os.rename(folder_path, root + '/' + 'Training Session - ' + timestamp_end)
 
-print("Training Succesfully finished.")
+print("Training Successfully finished.")
