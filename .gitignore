@@ -1,0 +1,8 @@
+venv-linux/bin/jupyter-kernelspec
+venv-linux/
+venv-windows/
+Training Logs/
+.vscode/settings.json
+deploy/__pycache__/data_processor.cpython-36.pyc
+deploy/__pycache__/model_loader.cpython-36.pyc
+

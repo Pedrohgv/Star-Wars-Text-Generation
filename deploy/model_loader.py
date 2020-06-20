@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model, Input
 import json
-from .data_processor import process_input, one_hot2char
+from data_processor import process_input, one_hot2char
 
 
 def generate_text(seed_string):
