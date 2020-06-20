@@ -10,4 +10,4 @@ A Web API was also developed, though it cannot be used using the files from this
 
 Due to lack of more data and hardware limitations, the model couldn't have the complexity needed for more accurate results; however, the final results were still interesting. This is the output of the model when the input "obi-wan-kenobi" is given:
 
-<img src="images/API.png" alt="drawing" width="2000" height="900"/>
+<img src="images/API.png" alt="drawing" width="900" height="444"/>
