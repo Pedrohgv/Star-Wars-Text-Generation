@@ -6,11 +6,6 @@ from tensorflow.keras.models import load_model
 from model_loader import generate_text
 
 
-# enable memory growth to be able to work with GPU
-GPU = tf.config.experimental.get_visible_devices('GPU')[0]
-tf.config.experimental.set_memory_growth(GPU, enable=True)
-
-
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = 'key'
 

@@ -6,7 +6,7 @@ approach, built to generate pieces of text based on a given title. All the data,
 sentence of the introduction of an article, was obtained from the
 [Wookiepdia website](https://starwars.fandom.com/wiki/Main_Page) using web scrapping tools.
 
-A Web API was also developed, though it cannot be used using the files from this repository since the final model exceeds the maximum allowed size for individual files on GitHub.
+An API was also developed, though it cannot be used using the files from this repository since the final model exceeds the maximum allowed size for individual files on GitHub.
 
 Due to lack of more data and hardware limitations, the model couldn't have the complexity needed for more accurate results; however, the final results were still interesting. This is the output of the model when the input "obi-wan-kenobi" is given:
 
