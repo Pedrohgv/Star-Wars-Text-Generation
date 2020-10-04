@@ -66,11 +66,7 @@ config['VALIDATION_SAMPLES'] = int(
     data.shape[0]) - (config['STEPS_PER_EPOCH'] * config['BATCH_SIZE'])
 config['VALIDATION_STEPS'] = int(
     np.floor(config['VALIDATION_SAMPLES'] / config['BATCH_SIZE']))
-'''
-config['STEPS_PER_EPOCH'] = 5
-config['VALIDATION_SAMPLES'] = 100
-config['VALIDATION_STEPS'] = 5
-'''
+ 
 # configures the learning rate to be decayed by the value specified at config['DECAY_AT_10_EPOCHS'] at each 10 epochs, but to that gradually at each epoch
 learning_rate = ExponentialDecay(initial_learning_rate=config['LEARNING_RATE'],
                                  decay_steps=config['STEPS_PER_EPOCH'],
@@ -81,8 +77,6 @@ learning_rate = ExponentialDecay(initial_learning_rate=config['LEARNING_RATE'],
 
 training_dataset, validation_dataset = build_datasets(
     data, seed=config['SEED'], validation_samples=config['VALIDATION_SAMPLES'], batch=config['BATCH_SIZE'], vocab=vocab)
-
-#learning_rate = config['LEARNING_RATE']
 
 if 'GRAD_VAL_CLIP' in config:
     optimizer = Adam(learning_rate=learning_rate,
@@ -101,7 +95,8 @@ if not os.path.exists(folder_path):
 with open(folder_path + '/config.json', 'w') as json_file:
     json.dump(config, json_file, indent=4)
 
-with open(folder_path + '/vocab.json', 'w') as json_file:  # saves the vocab used as a JSON file
+# saves the vocab used as a JSON file
+with open(folder_path + '/vocab.json', 'w') as json_file:  
     json.dump(vocab, json_file, indent=4)
 
 
@@ -175,11 +170,11 @@ history = model.fit(x=training_dataset,
                     validation_steps=config['VALIDATION_STEPS'])
 
 
-'''
+
 model.save(folder_path + '/trained_model.h5', save_format='h5')
 model.save_weights(folder_path + '/trained_model_weights.h5')
 plot_model(model, to_file=folder_path + '/model_layout.png', show_shapes=True, show_layer_names=True, rankdir='LR')
-'''
+
 
 timestamp_end = datetime.now().strftime('%d-%b-%y -- %H:%M:%S')
 
